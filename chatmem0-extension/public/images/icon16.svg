@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景圆 -->
+  <circle cx="64" cy="64" r="60" fill="url(#grad1)"/>
+  
+  <!-- 主要符号 - 聊天气泡组合 -->
+  <g fill="white">
+    <!-- 左侧聊天气泡 -->
+    <path d="M 35 40 Q 25 40 25 50 L 25 60 Q 25 70 35 70 L 50 70 L 45 78 L 45 70 Q 55 70 55 60 L 55 50 Q 55 40 45 40 Z" opacity="0.9"/>
+    
+    <!-- 右侧聊天气泡 -->
+    <path d="M 73 48 Q 63 48 63 58 L 63 68 Q 63 78 73 78 L 88 78 L 83 86 L 83 78 Q 93 78 93 68 L 93 58 Q 93 48 83 48 Z" opacity="0.9"/>
+    
+    <!-- 中心存储符号 -->
+    <rect x="54" y="84" width="20" height="4" rx="2" fill="white" opacity="0.8"/>
+    <rect x="54" y="90" width="20" height="4" rx="2" fill="white" opacity="0.8"/>
+    <rect x="54" y="96" width="20" height="4" rx="2" fill="white" opacity="0.8"/>
+  </g>
+  
+  <!-- 装饰元素 -->
+  <circle cx="40" cy="54" r="2" fill="white" opacity="0.7"/>
+  <circle cx="46" cy="54" r="2" fill="white" opacity="0.7"/>
+  <circle cx="78" cy="62" r="2" fill="white" opacity="0.7"/>
+  <circle cx="84" cy="62" r="2" fill="white" opacity="0.7"/>
+</svg>
