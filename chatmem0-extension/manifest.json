@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "ChatMem0 - AI对话管理器",
+  "version": "1.0.0",
+  "description": "自动同步和管理ChatGPT、Claude、文心一言、通义千问等AI平台的对话数据",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://yiyan.baidu.com/*",
+    "https://tongyi.aliyun.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chat.openai.com/*"],
+      "js": ["content/chatgpt.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://claude.ai/*"],
+      "js": ["content/claude.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://yiyan.baidu.com/*"],
+      "js": ["content/yiyan.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://tongyi.aliyun.com/*"],
+      "js": ["content/tongyi.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ChatMem0 - AI对话管理器",
+    "default_icon": {
+      "16": "public/images/icon16.svg",
+      "32": "public/images/icon32.svg",
+      "48": "public/images/icon48.svg",
+      "128": "public/images/icon128.svg"
+    }
+  },
+  "icons": {
+    "16": "public/images/icon16.svg",
+    "32": "public/images/icon32.svg",
+    "48": "public/images/icon48.svg",
+    "128": "public/images/icon128.svg"
+  }
+}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatMem0 - AI对话管理器</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- 头部 -->
+    <header class="popup-header">
+      <h1 class="app-title">ChatMem0</h1>
+      <div class="header-actions">
+        <button id="settings-btn" class="icon-btn" title="设置">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m20.4-6.4L19 5.2M5.2 5.2L1.6 1.6m21.8 20.8L19 18.8m-13.8 0L1.6 22.4"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 标签页 -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="status">状态</button>
+      <button class="tab-btn" data-tab="config">设置</button>
+      <button class="tab-btn" data-tab="manual">手动</button>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="tab-content">
+      <!-- 状态标签页 -->
+      <div id="status-tab" class="tab-panel active">
+        <div class="status-panel">
+          <div class="status-header">
+            <h3>同步状态</h3>
+            <button id="refresh-status" class="btn-small">刷新</button>
+          </div>
+          
+          <div class="platform-statuses" id="platform-statuses">
+            <!-- 平台状态将通过JS动态生成 -->
+          </div>
+          
+          <div class="overall-stats">
+            <div class="stat-item">
+              <span class="label">总对话数:</span>
+              <span class="value" id="total-conversations">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="label">今日同步:</span>
+              <span class="value" id="today-synced">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="label">最后同步:</span>
+              <span class="value" id="last-sync">从未</span>
+            </div>
+            <div class="stat-item">
+              <span class="label">存储使用:</span>
+              <span class="value" id="storage-used">0 KB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设置标签页 -->
+      <div id="config-tab" class="tab-panel">
+        <div class="config-panel">
+          <div class="config-section">
+            <h4>同步设置</h4>
+            <div class="config-item">
+              <label class="switch">
+                <input type="checkbox" id="auto-sync" />
+                <span class="slider"></span>
+                <span class="label-text">启用自动同步</span>
+              </label>
+            </div>
+            <div class="config-item">
+              <label>
+                同步间隔 (秒):
+                <input type="number" id="sync-interval" min="60" max="3600" value="300" />
+              </label>
+            </div>
+            <div class="config-item">
+              <label>
+                数据保留天数:
+                <input type="number" id="retention-days" min="1" max="365" value="30" />
+              </label>
+            </div>
+          </div>
+          
+          <div class="config-section">
+            <h4>平台设置</h4>
+            <div class="platform-toggles" id="platform-toggles">
+              <!-- 平台开关将通过JS动态生成 -->
+            </div>
+          </div>
+          
+          <div class="config-section">
+            <h4>服务器设置</h4>
+            <div class="config-item">
+              <label>
+                API端点:
+                <input type="url" id="api-endpoint" placeholder="https://api.example.com" />
+              </label>
+            </div>
+            <div class="config-item">
+              <label>
+                认证Token:
+                <input type="password" id="auth-token" placeholder="输入访问令牌" />
+                <button id="show-token" class="btn-small">显示</button>
+              </label>
+            </div>
+          </div>
+          
+          <div class="config-actions">
+            <button id="save-config" class="btn-primary">保存设置</button>
+            <button id="reset-config" class="btn-secondary">重置默认</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 手动操作标签页 -->
+      <div id="manual-tab" class="tab-panel">
+        <div class="manual-panel">
+          <div class="manual-section">
+            <h4>手动同步</h4>
+            <p class="description">立即同步所有平台的对话数据到服务器。</p>
+            <button id="sync-all" class="btn-primary">同步所有对话</button>
+          </div>
+          
+          <div class="manual-section">
+            <h4>数据管理</h4>
+            <p class="description">清理本地存储的对话数据。</p>
+            <button id="cleanup-data" class="btn-secondary">清理过期数据</button>
+            <button id="clear-all-data" class="btn-danger">清除所有数据</button>
+          </div>
+          
+          <div class="manual-section">
+            <h4>导出导入</h4>
+            <p class="description">导出或导入对话数据备份。</p>
+            <button id="export-data" class="btn-primary">导出数据</button>
+            <button id="import-data" class="btn-secondary">导入数据</button>
+            <input type="file" id="import-file" accept=".json" style="display: none;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通知区域 -->
+    <div id="notification" class="notification hidden">
+      <span class="notification-message"></span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
