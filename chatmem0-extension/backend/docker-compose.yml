@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  chatmem0-backend:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chatmem0.db:/app/chatmem0.db
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DEBUG=False
+    restart: unless-stopped

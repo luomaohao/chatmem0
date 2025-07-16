@@ -2,20 +2,47 @@
 
 Backend service for the ChatMem0 browser extension.
 
-## Quick Setup (No Authentication)
+## 🚀 优化启动过程
 
-1. **Install dependencies:**
+### 方式1: 一键启动脚本 (推荐)
+
+**Linux/Mac:**
+```bash
+cd backend
+./start.sh
+```
+
+**Windows:**
+```cmd
+cd backend
+start.bat
+```
+
+### 方式2: 开发模式 (热重载)
+```bash
+cd backend
+python dev.py
+```
+
+### 方式3: Docker 容器化
+```bash
+cd backend
+docker-compose up
+```
+
+### 方式4: 手动启动
 ```bash
 cd backend
 pip install -r requirements.txt
-```
-
-2. **Run the server:**
-```bash
 python run.py
 ```
 
-The API will be available at `http://localhost:8000` with authentication disabled for testing.
+## ✅ 启动验证
+
+服务启动后访问:
+- 🏠 主页: http://localhost:8000
+- 🔍 API文档: http://localhost:8000/docs  
+- ❤️ 健康检查: http://localhost:8000/health
 
 ## API Endpoints
 

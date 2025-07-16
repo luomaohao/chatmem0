@@ -34,7 +34,22 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "message": "API is operational"}
+    try:
+        from app.db.database import SessionLocal
+        db = SessionLocal()
+        db.execute("SELECT 1")
+        db.close()
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+    
+    return {
+        "status": "healthy",
+        "message": "API is operational",
+        "database": db_status,
+        "version": "1.0.0",
+        "auth_disabled": True
+    }
 
 if __name__ == "__main__":
     import uvicorn
