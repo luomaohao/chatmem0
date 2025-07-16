@@ -1,5 +1,5 @@
 import os
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     # 安全配置
     SECRET_KEY: str = "your-secret-key-here"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    
+    # 认证配置
+    AUTH_DISABLED: bool = False
     
     class Config:
         env_file = ".env"
