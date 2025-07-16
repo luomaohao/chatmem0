@@ -4,9 +4,9 @@ from datetime import datetime
 
 class MessageSchema(BaseModel):
     id: str
-    role: str = Field(..., regex="^(user|assistant|system)$")
+    role: str = Field(..., pattern="^(user|assistant|system)$")
     content: str
-    contentType: str = Field(..., regex="^(text|code|image|mixed)$")
+    contentType: str = Field(..., pattern="^(text|code|image|mixed)$")
     timestamp: str
     metadata: Optional[Dict[str, Any]] = None
     

@@ -17,7 +17,7 @@ class Conversation(Base):
     processed_at = Column(DateTime(timezone=True), nullable=True)
     tags = Column(JSON, nullable=True)
     summary = Column(Text, nullable=True)
-    metadata = Column(JSON, nullable=True)
+    meta_data = Column("metadata", String)  # Python attribute is meta_data, DB column is 'metadata'
     
     db_created_at = Column(DateTime(timezone=True), server_default=func.now())
     db_updated_at = Column(DateTime(timezone=True), onupdate=func.now())
