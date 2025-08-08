@@ -45,7 +45,7 @@ class TongyiExtractor extends BaseExtractor {
   
   private extractConversationId(): string {
     // 尝试从URL提取会话ID
-    const urlMatch = window.location.href.match(/conversation[\/\-]([a-zA-Z0-9]+)/);
+    const urlMatch = window.location.href.match(/conversation[/-]([a-zA-Z0-9]+)/);
     if (urlMatch) return urlMatch[1];
     
     // 尝试从页面数据属性获取
