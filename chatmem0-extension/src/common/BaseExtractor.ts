@@ -19,11 +19,8 @@ export abstract class BaseExtractor {
   
   // 通用方法
   startMonitoring(): void {
-    if (!this.isValidConversationPage()) {
-      console.log(`[${this.platform}] Not a valid conversation page`);
-      return;
-    }
-    
+    // 总是启动监控，避免因初始DOM未渲染而错过对话
+    // 是否有效由提取阶段决定
     console.log(`[${this.platform}] Starting monitoring`);
     
     if (this.observer) {
@@ -34,7 +31,7 @@ export abstract class BaseExtractor {
       });
     }
     
-    // 立即提取一次
+    // 立即尝试提取一次（如果DOM未就绪会安全返回）
     this.debounceExtraction();
   }
   

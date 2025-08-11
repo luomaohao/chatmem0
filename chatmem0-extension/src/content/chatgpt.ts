@@ -8,12 +8,14 @@ class ChatGPTExtractor extends BaseExtractor {
   
   getPlatformSelectors(): PlatformSelectors {
     return {
-      conversationContainer: '[data-testid="conversation-turn"]',
+      // 兼容多版本结构：新旧data属性、role容器、可视消息块
+      conversationContainer: '[data-testid="conversation-turn"], [data-message-author-role], [data-testid="chat-message"]',
       userMessage: '[data-message-author-role="user"]',
       assistantMessage: '[data-message-author-role="assistant"]',
-      messageContent: '.prose',
+      // 内容容器的多候选
+      messageContent: '.prose, [data-message-content], .markdown, .msg-content, .whitespace-pre-wrap',
       timestamp: 'time',
-      conversationTitle: 'h1',
+      conversationTitle: 'h1, header h1, [data-testid="conversation-title"]',
       conversationId: () => this.extractConversationId()
     };
   }
@@ -45,8 +47,15 @@ class ChatGPTExtractor extends BaseExtractor {
   }
   
   private extractConversationId(): string {
-    const match = window.location.pathname.match(/\/c\/([a-zA-Z0-9-]+)/);
-    return match ? match[1] : this.generateTempId();
+    // URL中的会话ID（兼容 c/ 或 chat/）
+    const pathMatch = window.location.pathname.match(/\/(?:c|chat)\/([a-zA-Z0-9-]+)/);
+    if (pathMatch && pathMatch[1]) return pathMatch[1];
+    // DOM数据属性
+    const el = document.querySelector('[data-conversation-id], [data-thread-id], [data-testid="conversation"]');
+    const id = el?.getAttribute('data-conversation-id') || el?.getAttribute('data-thread-id');
+    if (id) return id;
+    // 回退
+    return this.generateTempId();
   }
   
   private extractMessages(): Message[] {
@@ -104,7 +113,7 @@ class ChatGPTExtractor extends BaseExtractor {
     }
     
     // 最后使用第一条用户消息的前50个字符作为标题
-    const firstUserMessage = document.querySelector('[data-message-author-role="user"] .prose');
+    const firstUserMessage = document.querySelector('[data-message-author-role="user"] .prose, [data-message-author-role="user"] [data-message-content]');
     if (firstUserMessage?.textContent) {
       const text = firstUserMessage.textContent.trim();
       return text.length > 50 ? text.substring(0, 50) + '...' : text;
