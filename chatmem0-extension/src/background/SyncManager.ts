@@ -137,16 +137,27 @@ export class SyncManager {
   private async sendToBackend(conversation: ProcessedConversation): Promise<void> {
     const config = await this.storageManager.getConfig();
     
-    if (!config.apiEndpoint) {
-      throw new Error('API endpoint not configured');
+    // 若未配置端点，则跳过上传，不视为错误
+    if (!config.apiEndpoint || config.apiEndpoint.trim() === '') {
+      console.warn('[SyncManager] Skipping backend sync: API endpoint not configured');
+      return;
     }
-    
-    const response = await fetch(config.apiEndpoint + '/conversations', {
+
+    // 规范化 URL，避免重复斜杠
+    const base = config.apiEndpoint.replace(/\/+$/, '');
+    const url = `${base}/conversations`;
+
+    // 仅在有 token 时附带 Authorization
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (config.authToken && config.authToken.trim().length > 0) {
+      headers['Authorization'] = `Bearer ${config.authToken.trim()}`;
+    }
+
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.authToken}`
-      },
+      headers,
       body: JSON.stringify(conversation)
     });
     

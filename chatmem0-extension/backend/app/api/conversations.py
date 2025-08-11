@@ -37,7 +37,8 @@ async def create_or_update_conversation(
             existing.processed_at = processed_at
             existing.tags = conversation.tags
             existing.summary = conversation.summary
-            existing.metadata = conversation.metadata
+            # 注意: 模型属性名是 meta_data，数据库列名为 'metadata'
+            existing.meta_data = conversation.metadata
             
             db.commit()
             db.refresh(existing)
@@ -62,7 +63,8 @@ async def create_or_update_conversation(
                 processed_at=processed_at,
                 tags=conversation.tags,
                 summary=conversation.summary,
-                metadata=conversation.metadata
+                # 模型属性名是 meta_data，数据库列名为 'metadata'
+                meta_data=conversation.metadata
             )
             
             db.add(new_conversation)
@@ -106,7 +108,8 @@ async def get_conversation(
             "processedAt": conversation.processed_at.isoformat() if conversation.processed_at else None,
             "tags": conversation.tags,
             "summary": conversation.summary,
-            "metadata": conversation.metadata
+            # 使用模型属性名 meta_data
+            "metadata": conversation.meta_data
         }
     except HTTPException:
         raise
@@ -147,7 +150,8 @@ async def get_conversations(
                 "processedAt": conv.processed_at.isoformat() if conv.processed_at else None,
                 "tags": conv.tags,
                 "summary": conv.summary,
-                "metadata": conv.metadata
+                # 使用模型属性名 meta_data
+                "metadata": conv.meta_data
             }
             for conv in conversations
         ]

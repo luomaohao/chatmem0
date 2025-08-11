@@ -252,12 +252,16 @@ class PopupManager {
       document.querySelectorAll('#platform-toggles input[type="checkbox"]:checked')
     ).map(input => input.getAttribute('data-platform')!);
     
+    // 读取并规范化端点，允许不填token
+    let apiEndpoint = (document.getElementById('api-endpoint') as HTMLInputElement).value.trim();
+    apiEndpoint = apiEndpoint.replace(/\/+$/, '');
+
     const newConfig: AppConfig = {
       autoSync: (document.getElementById('auto-sync') as HTMLInputElement).checked,
       syncInterval: parseInt((document.getElementById('sync-interval') as HTMLInputElement).value),
       dataRetentionDays: parseInt((document.getElementById('retention-days') as HTMLInputElement).value),
-      apiEndpoint: (document.getElementById('api-endpoint') as HTMLInputElement).value,
-      authToken: (document.getElementById('auth-token') as HTMLInputElement).value,
+      apiEndpoint,
+      authToken: (document.getElementById('auth-token') as HTMLInputElement).value.trim(),
       enabledPlatforms
     };
     
@@ -267,7 +271,12 @@ class PopupManager {
     // 通知background更新配置
     await this.sendMessage({ type: 'CONFIG_UPDATED', config: newConfig });
     
-    this.showNotification('设置已保存', 'success');
+    // 简单校验提示（无需认证）：提示已保存，若未填端点给出温馨提示
+    if (!apiEndpoint) {
+      this.showNotification('设置已保存：未配置API端点，将仅本地保存', 'warning');
+    } else {
+      this.showNotification('设置已保存', 'success');
+    }
   }
   
   private async resetConfig() {
