@@ -74,12 +74,12 @@ export class SyncManager {
       
       // 数据处理
       const processedConversation = await this.dataProcessor.processConversation(task.conversation);
-      
-      // 发送到后端
-      await this.sendToBackend(processedConversation);
-      
-      // 更新本地存储
+
+      // 优先本地保存，保证可见性
       await this.storageManager.saveConversation(processedConversation);
+
+      // 再发送到后端
+      await this.sendToBackend(processedConversation);
       
       // 更新同步状态为成功
       await this.storageManager.updateSyncStatus(task.conversation.id, {

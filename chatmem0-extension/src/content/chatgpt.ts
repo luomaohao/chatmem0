@@ -1,5 +1,5 @@
 import { BaseExtractor } from '../common/BaseExtractor';
-import { Conversation, PlatformSelectors, Message, ContentType } from '../types';
+import { Conversation, PlatformSelectors, Message } from '../types';
 
 class ChatGPTExtractor extends BaseExtractor {
   constructor() {
@@ -19,8 +19,8 @@ class ChatGPTExtractor extends BaseExtractor {
   }
   
   isValidConversationPage(): boolean {
-    return window.location.pathname.startsWith('/c/') && 
-           document.querySelector(this.selectors.conversationContainer) !== null;
+    // 仅依赖于对话容器是否存在，兼容不同域名/路径
+    return document.querySelector(this.selectors.conversationContainer) !== null;
   }
   
   extractConversation(): Conversation | null {
@@ -55,8 +55,13 @@ class ChatGPTExtractor extends BaseExtractor {
     
     turns.forEach((turn, index) => {
       const element = turn as HTMLElement;
-      const role = element.getAttribute('data-message-author-role');
-      const contentEl = element.querySelector(this.selectors.messageContent) as HTMLElement;
+      // Some pages place the author role on a descendant rather than the container itself
+      const authorElement = element.matches('[data-message-author-role]')
+        ? element
+        : (element.querySelector('[data-message-author-role]') as HTMLElement | null);
+      const role = authorElement?.getAttribute('data-message-author-role');
+      const contentEl = (authorElement?.querySelector(this.selectors.messageContent) ||
+        element.querySelector(this.selectors.messageContent)) as HTMLElement | null;
       
       if (contentEl && role && (role === 'user' || role === 'assistant')) {
         messages.push({
@@ -136,10 +141,19 @@ const urlObserver = new MutationObserver(() => {
   }
 });
 
-urlObserver.observe(document.body, {
-  childList: true,
-  subtree: true
-});
+const startUrlObserver = () => {
+  if (!document.body) return;
+  urlObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startUrlObserver);
+} else {
+  startUrlObserver();
+}
 
 // 页面卸载时清理
 window.addEventListener('beforeunload', () => {
