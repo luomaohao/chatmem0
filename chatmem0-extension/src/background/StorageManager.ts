@@ -59,15 +59,29 @@ export class StorageManager {
   }
   
   async saveConfig(config: AppConfig): Promise<void> {
-    await chrome.storage.sync.set({
-      [this.STORAGE_KEYS.CONFIG]: config
-    });
-    console.log('[StorageManager] Config saved');
+    // 双写到 sync 与 local，提升持久化稳定性
+    try {
+      await chrome.storage.sync.set({ [this.STORAGE_KEYS.CONFIG]: config });
+    } catch (e) {
+      // ignore
+    }
+    try {
+      await chrome.storage.local.set({ [this.STORAGE_KEYS.CONFIG]: config });
+    } catch (e) {
+      // ignore
+    }
+    console.log('[StorageManager] Config saved (sync & local)');
   }
   
   async getConfig(): Promise<AppConfig> {
-    const result = await chrome.storage.sync.get(this.STORAGE_KEYS.CONFIG);
-    return result[this.STORAGE_KEYS.CONFIG] || {
+    // 优先从 sync 读取，若无则回退到 local
+    const resultSync = await chrome.storage.sync.get(this.STORAGE_KEYS.CONFIG);
+    const fromSync = resultSync[this.STORAGE_KEYS.CONFIG];
+    if (fromSync) return fromSync as AppConfig;
+    const resultLocal = await chrome.storage.local.get(this.STORAGE_KEYS.CONFIG);
+    const fromLocal = resultLocal[this.STORAGE_KEYS.CONFIG];
+    if (fromLocal) return fromLocal as AppConfig;
+    return {
       autoSync: false,
       syncInterval: 300,
       dataRetentionDays: 30,

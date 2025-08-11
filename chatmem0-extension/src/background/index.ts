@@ -37,8 +37,10 @@ chrome.runtime.onMessage.addListener((message: ChromeMessage, sender, sendRespon
       
     case 'CONFIG_UPDATED':
       if (message.config) {
-        handleConfigUpdate(message.config);
-        sendResponse({ success: true });
+        handleConfigUpdate(message.config).then(() => sendResponse({ success: true })).catch(err => {
+          console.error('[Background] Config update failed', err);
+          sendResponse({ success: false, error: err?.message || String(err) });
+        });
       }
       break;
       

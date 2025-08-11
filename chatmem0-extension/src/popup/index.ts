@@ -37,6 +37,9 @@ class PopupManager {
     document.getElementById('save-config')?.addEventListener('click', () => {
       this.saveConfig();
     });
+    document.getElementById('quick-save-config')?.addEventListener('click', () => {
+      this.saveConfig();
+    });
     
     document.getElementById('reset-config')?.addEventListener('click', () => {
       this.resetConfig();
@@ -204,8 +207,15 @@ class PopupManager {
   }
   
   private async loadConfig() {
-    const result = await chrome.storage.sync.get('config');
-    this.config = result.config || {
+    // 同步端读取优先，回退到 local
+    const resultSync = await chrome.storage.sync.get('config');
+    const cfgSync = resultSync.config;
+    if (cfgSync) {
+      this.config = cfgSync;
+      return;
+    }
+    const resultLocal = await chrome.storage.local.get('config');
+    this.config = resultLocal.config || {
       autoSync: false,
       syncInterval: 300,
       dataRetentionDays: 30,
@@ -265,7 +275,9 @@ class PopupManager {
       enabledPlatforms
     };
     
+    // 双写，提高持久化稳定性
     await chrome.storage.sync.set({ config: newConfig });
+    await chrome.storage.local.set({ config: newConfig });
     this.config = newConfig;
     
     // 通知background更新配置

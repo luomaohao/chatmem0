@@ -90,6 +90,7 @@ export class SyncManager {
       
       // 通知UI更新
       this.notifyUI('SYNC_SUCCESS', { conversationId: task.conversation.id });
+      this.notifySystem('同步成功', `会话已上传：${task.conversation.title || task.conversation.id}`);
       
     } catch (error) {
       console.error(`[SyncManager] Task ${task.id} failed:`, error);
@@ -132,6 +133,7 @@ export class SyncManager {
       conversationId: task.conversation.id,
       error: error.message 
     });
+    this.notifySystem('同步失败', `${task.conversation.title || task.conversation.id}: ${error.message}`);
   }
   
   private async sendToBackend(conversation: ProcessedConversation): Promise<void> {
@@ -183,5 +185,28 @@ export class SyncManager {
         }
       });
     });
+  }
+
+  private notifySystem(title: string, message: string): void {
+    if (!('notifications' in chrome)) return;
+    try {
+      chrome.notifications.create('', {
+        type: 'basic',
+        iconUrl: 'public/images/icon48.svg',
+        title,
+        message
+      });
+    } catch {
+      // ignore
+    }
+
+    // 尝试设置徽章文本，提示一次性事件
+    try {
+      chrome.action.setBadgeText({ text: '✓' });
+      chrome.action.setBadgeBackgroundColor({ color: '#2ecc71' });
+      setTimeout(() => chrome.action.setBadgeText({ text: '' }), 2000);
+    } catch {
+      // ignore
+    }
   }
 }

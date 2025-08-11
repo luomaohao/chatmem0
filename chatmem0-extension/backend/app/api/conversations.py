@@ -6,6 +6,7 @@ from app.models.conversation import Conversation
 from app.schemas.conversation import ConversationSchema, ConversationResponse, ErrorResponse
 from datetime import datetime
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -37,8 +38,8 @@ async def create_or_update_conversation(
             existing.processed_at = processed_at
             existing.tags = conversation.tags
             existing.summary = conversation.summary
-            # 注意: 模型属性名是 meta_data，数据库列名为 'metadata'
-            existing.meta_data = conversation.metadata
+            # 注意: 模型属性名是 meta_data，数据库列名为 'metadata'；存储为JSON字符串
+            existing.meta_data = json.dumps(conversation.metadata, ensure_ascii=False) if conversation.metadata is not None else None
             
             db.commit()
             db.refresh(existing)
@@ -63,8 +64,8 @@ async def create_or_update_conversation(
                 processed_at=processed_at,
                 tags=conversation.tags,
                 summary=conversation.summary,
-                # 模型属性名是 meta_data，数据库列名为 'metadata'
-                meta_data=conversation.metadata
+                # 模型属性名是 meta_data，数据库列名为 'metadata'；存储为JSON字符串
+                meta_data=json.dumps(conversation.metadata, ensure_ascii=False) if conversation.metadata is not None else None
             )
             
             db.add(new_conversation)
@@ -96,6 +97,17 @@ async def get_conversation(
         if not conversation:
             raise HTTPException(status_code=404, detail="Conversation not found")
         
+        # 解析存储的JSON字符串
+        def parse_meta(meta):
+            if meta is None:
+                return None
+            if isinstance(meta, str):
+                try:
+                    return json.loads(meta)
+                except Exception:
+                    return meta
+            return meta
+
         return {
             "id": conversation.id,
             "platform": conversation.platform,
@@ -108,8 +120,8 @@ async def get_conversation(
             "processedAt": conversation.processed_at.isoformat() if conversation.processed_at else None,
             "tags": conversation.tags,
             "summary": conversation.summary,
-            # 使用模型属性名 meta_data
-            "metadata": conversation.meta_data
+            # 使用模型属性名 meta_data（字符串时解析）
+            "metadata": parse_meta(conversation.meta_data)
         }
     except HTTPException:
         raise
@@ -137,6 +149,16 @@ async def get_conversations(
         # 按更新时间倒序排列
         conversations = query.order_by(desc(Conversation.updated_at)).offset(skip).limit(limit).all()
         
+        def parse_meta(meta):
+            if meta is None:
+                return None
+            if isinstance(meta, str):
+                try:
+                    return json.loads(meta)
+                except Exception:
+                    return meta
+            return meta
+
         return [
             {
                 "id": conv.id,
@@ -150,8 +172,8 @@ async def get_conversations(
                 "processedAt": conv.processed_at.isoformat() if conv.processed_at else None,
                 "tags": conv.tags,
                 "summary": conv.summary,
-                # 使用模型属性名 meta_data
-                "metadata": conv.meta_data
+                # 使用模型属性名 meta_data（字符串时解析）
+                "metadata": parse_meta(conv.meta_data)
             }
             for conv in conversations
         ]
